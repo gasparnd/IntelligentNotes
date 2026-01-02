@@ -1,5 +1,5 @@
 //
-//  IntelligentNoteAppApp.swift
+//  IntelligentNoteApp.swift
 //  IntelligentNoteApp
 //
 //  Created by Gaspar Dolcemascolo on 02-01-26.
