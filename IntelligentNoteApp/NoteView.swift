@@ -16,7 +16,6 @@ struct NoteView: View {
                 .font(.largeTitle)
                 .padding(.bottom, 18)
             TextEditor(text: $note.body)
-            //        TextField()
         }.padding().navigationTitle("Intgelligent Notes")
     }
 }
