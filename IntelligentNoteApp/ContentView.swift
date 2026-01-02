@@ -22,7 +22,7 @@ struct ContentView: View {
                             .tag(note)
                     }
                 }
-            }.navigationTitle("Intgelligent Notes").frame(maxWidth: 200)
+            }
         } detail: {
             if let note = selectedNote {
                 NoteView(note: binding(for: note))
@@ -34,7 +34,7 @@ struct ContentView: View {
             Button(action: didClickAddNote) {
                 Image(systemName: "square.and.pencil")
             }
-        }
+        }.navigationTitle("Intgelligent Notes")
     }
 }
 
