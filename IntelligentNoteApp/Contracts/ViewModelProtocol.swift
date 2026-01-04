@@ -19,5 +19,5 @@ protocol ViewModelProtocol: ObservableObject {
     /// Donwload Note
     func downloadNote(id: UUID) -> Bool
     /// Analyze command with FoundationModel
-    func analyzeWith(command: String) -> String
+    func analyzeWith(command: String) async throws -> String
 }

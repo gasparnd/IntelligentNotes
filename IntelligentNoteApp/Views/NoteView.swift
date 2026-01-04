@@ -71,27 +71,17 @@ extension NoteView {
     }
     
     private func handleThinkCommand(instruction: String, commandRange: Range<String.Index>, fullText: String) {
-        print("Think command received with instruction: \(instruction)")
-        
-        // Save the command text to search for it later (since the text might change)
-        
         let commandText = String(fullText[commandRange])
-        
         if let range = note.body.range(of: commandText) {
             note.body.replaceSubrange(range, with: "Thinking...")
         }
         
-        let response = model.analyzeWith(command: commandText)
-        // Create a Task that waits 5 seconds and then replaces the command
         Task {
-            try? await Task.sleep(nanoseconds: 5_000_000_000) // 5 seconds
-            
-            await MainActor.run {
-                // Find the command in the current text and replace it
-                if let range = note.body.range(of: "Thinking...") {
-                    note.body.replaceSubrange(range, with: response)
-                }
+            let response = try await model.analyzeWith(command: commandText)
+            if let range = note.body.range(of: "Thinking...") {
+                note.body.replaceSubrange(range, with: response)
             }
+            updateNote()
         }
     }
     

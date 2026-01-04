@@ -65,13 +65,26 @@ class NotesViewModel: ViewModelProtocol {
         }
     }
     
-    func analyzeWith(command: String) -> String {
+    func analyzeWith(command: String) async throws -> String {
         let (availability, reason) = checkForSystemLanguageModelAvailability()
         
         if !availability {
             return reason
         }
         
-        return "This is the result of the think: command!"
+        let session = LanguageModelSession()
+        
+        let prompt = "Response in the language of the entry, if that is not possible, english. Prompt: \(command)"
+        
+        do {
+            let response = try await session.respond(to: prompt)
+            return response.content
+        } catch {
+            print("Error responding \(error.localizedDescription)")
+            if let _ = error as? FoundationModels.LanguageModelSession.GenerationError {
+                return "Sorry we cannot help you with that"
+            }
+            return "Error responding"
+        }
     }
 }
