@@ -9,6 +9,13 @@ import SwiftUI
 
 struct NoteView: View {
     @Binding var note: Note
+    @EnvironmentObject var model: NotesViewModel
+    @Environment(\.dismiss) private var dismiss
+    
+    private func didClcikDelete() {
+        model.deleteNote(id: note.id)
+        dismiss()
+    }
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -16,7 +23,15 @@ struct NoteView: View {
                 .font(.largeTitle)
                 .padding(.bottom, 18)
             TextEditor(text: $note.body)
-        }.padding().navigationTitle("Intgelligent Notes")
+        }
+        .padding()
+        .toolbar {
+            Button(action: didClcikDelete) {
+                Image(systemName: "trash")
+                    .foregroundStyle(Color.red)
+            }
+        }
+        .navigationTitle("Intgelligent Notes")
     }
 }
 

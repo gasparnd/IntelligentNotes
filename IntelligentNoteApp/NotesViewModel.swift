@@ -39,7 +39,8 @@ class NotesViewModel: ViewModelProtocol {
     
     func deleteNote(id: UUID) {
         dataSource.deleteNote(id: id)
-        getNotes()
+        let storedNotes = dataSource.getNotes()
+        notes = storedNotes
     }
     
     func downloadNote(id: UUID) -> Bool {
