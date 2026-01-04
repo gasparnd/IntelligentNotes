@@ -31,9 +31,24 @@ struct NoteView: View {
         model.updateNote(id: note.id, with: newNote)
     }
     
-    private func handleThinkCommand(instruction: String) {
+    private func handleThinkCommand(instruction: String, commandRange: Range<String.Index>, fullText: String) {
         print("Think command received with instruction: \(instruction)")
-        // Add the logic you need to execute here
+        
+        // Save the command text to search for it later (since the text might change)
+        let commandText = String(fullText[commandRange])
+        
+        // Create a Task that waits 5 seconds and then replaces the command
+        Task {
+            try? await Task.sleep(nanoseconds: 5_000_000_000) // 5 seconds
+            
+            await MainActor.run {
+                // Find the command in the current text and replace it
+                if let range = note.body.range(of: commandText) {
+                    let replacement = "This is the result of the think: command!"
+                    note.body.replaceSubrange(range, with: replacement)
+                }
+            }
+        }
     }
     
     private func checkForThinkCommand(in newText: String, oldText: String) {
@@ -46,15 +61,26 @@ struct NoteView: View {
         
         let instructionStart = lastRange.upperBound
         
-        // Find the end of the instruction (newline, end of text, or two consecutive spaces)
+        // Check if there's content after the colon and space
+        guard instructionStart < newText.endIndex else {
+            return
+        }
+        
+        // Find the end of the instruction by looking for two consecutive spaces
         var instructionEnd = instructionStart
         var foundDoubleSpace = false
+        var hasContent = false
         
         // Search until finding newline, end of text, or two consecutive spaces
         while instructionEnd < newText.endIndex {
             let char = newText[instructionEnd]
             
-            // If we find two consecutive spaces, the instruction is not valid
+            // Track if we have content (non-space characters)
+            if char != " " && char != "\n" {
+                hasContent = true
+            }
+            
+            // If we find two consecutive spaces, the command has finished
             if char == " " && instructionEnd < newText.index(before: newText.endIndex) {
                 let nextIndex = newText.index(after: instructionEnd)
                 if nextIndex < newText.endIndex && newText[nextIndex] == " " {
@@ -71,31 +97,49 @@ struct NoteView: View {
             instructionEnd = newText.index(after: instructionEnd)
         }
         
-        // Extract the instruction
-        let instruction = String(newText[instructionStart..<instructionEnd]).trimmingCharacters(in: .whitespaces)
-        
-        // Only execute if:
-        // 1. There are no two consecutive spaces
-        // 2. There is a non-empty instruction
+        // The command is complete when:
+        // 1. We found two consecutive spaces
+        // 2. There is content after "/think: "
         // 3. This is a new occurrence (it wasn't in the previous text)
-        if !foundDoubleSpace && !instruction.isEmpty {
-            // Check if this instruction is new by comparing with the previous text
-            let previousInstruction: String
+        if foundDoubleSpace && hasContent {
+            // Extract the instruction (up to the first space of the double space)
+            let instruction = String(newText[instructionStart..<instructionEnd]).trimmingCharacters(in: .whitespaces)
+            
+            // Check if this command is new by comparing with the previous text
+            let previousCommandText: String
             if let prevRange = oldText.range(of: pattern, options: .backwards),
                prevRange.upperBound < oldText.endIndex {
                 let prevStart = prevRange.upperBound
                 var prevEnd = prevStart
+                var prevFoundDoubleSpace = false
+                
                 while prevEnd < oldText.endIndex && oldText[prevEnd] != "\n" {
+                    if oldText[prevEnd] == " " && prevEnd < oldText.index(before: oldText.endIndex) {
+                        let nextIndex = oldText.index(after: prevEnd)
+                        if nextIndex < oldText.endIndex && oldText[nextIndex] == " " {
+                            prevFoundDoubleSpace = true
+                            break
+                        }
+                    }
                     prevEnd = oldText.index(after: prevEnd)
                 }
-                previousInstruction = String(oldText[prevStart..<prevEnd]).trimmingCharacters(in: .whitespaces)
+                
+                if prevFoundDoubleSpace {
+                    previousCommandText = String(oldText[prevRange.lowerBound..<prevEnd])
+                } else {
+                    previousCommandText = ""
+                }
             } else {
-                previousInstruction = ""
+                previousCommandText = ""
             }
             
-            // Only execute if the instruction is different from the previous one
-            if instruction != previousInstruction {
-                handleThinkCommand(instruction: instruction)
+            // Create the full command range (from "/think: " to the first space of the double space)
+            let commandRange = lastRange.lowerBound..<instructionEnd
+            
+            // Only execute if this is a new command (it wasn't in the previous text)
+            let currentCommandText = String(newText[commandRange])
+            if currentCommandText != previousCommandText {
+                handleThinkCommand(instruction: instruction, commandRange: commandRange, fullText: newText)
             }
         }
     }
