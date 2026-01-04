@@ -19,6 +19,44 @@ struct NoteView: View {
     // State to track previous text and avoid multiple executions
     @State private var previousBodyText: String = ""
     
+    var body: some View {
+        VStack(alignment: .leading) {
+            TextField("Title", text: $note.title)
+                .font(.largeTitle)
+                .padding(.bottom, 18)
+            TextEditor(text: $note.body)
+        }
+        .padding()
+        .toolbar {
+            Button(action: didClcikDelete) {
+                Image(systemName: "trash")
+                    .foregroundStyle(Color.red)
+            }
+        }
+        .navigationTitle("Intgelligent Notes")
+        .onReceive(timer) { _ in
+            updateNote()
+        }
+        .onChange(of: note.body) { oldValue, newValue in
+            // Verify if text contains Think command
+            if newValue.contains("/think: ") {
+                checkForThinkCommand(in: newValue, oldText: oldValue)
+            }
+            previousBodyText = newValue
+        }
+        .onAppear {
+            previousBodyText = note.body
+        }
+    }
+}
+
+#Preview {
+    NoteView(note: .constant(Note(title: "Title", body: "Body")))
+}
+
+
+// MARK: - Functions
+extension NoteView {
     private func didClcikDelete() {
         model.deleteNote(id: note.id)
         dismiss()
@@ -143,38 +181,4 @@ struct NoteView: View {
             }
         }
     }
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            TextField("Title", text: $note.title)
-                .font(.largeTitle)
-                .padding(.bottom, 18)
-            TextEditor(text: $note.body)
-        }
-        .padding()
-        .toolbar {
-            Button(action: didClcikDelete) {
-                Image(systemName: "trash")
-                    .foregroundStyle(Color.red)
-            }
-        }
-        .navigationTitle("Intgelligent Notes")
-        .onReceive(timer) { _ in
-            updateNote()
-        }
-        .onChange(of: note.body) { oldValue, newValue in
-            // Verify if text contains Think command
-            if newValue.contains("/think: ") {
-                checkForThinkCommand(in: newValue, oldText: oldValue)
-            }
-            previousBodyText = newValue
-        }
-        .onAppear {
-            previousBodyText = note.body
-        }
-    }
-}
-
-#Preview {
-    NoteView(note: .constant(Note(title: "Title", body: "Body")))
 }
