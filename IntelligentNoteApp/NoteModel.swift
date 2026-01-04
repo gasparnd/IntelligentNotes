@@ -31,7 +31,7 @@ final class NoteModel {
         body: String,
         createdAt: Date
     ) {
-        self.id = UUID()
+        self.id = id
         self.title = title
         self.body = body
         self.createdAt = createdAt

@@ -9,7 +9,7 @@ import Foundation
 
 protocol ViewModelProtocol: ObservableObject {
     /// Get Notes
-    func getNotes() -> [Note]
+    func getNotes()
     /// Create Note
     func createNote(from: Note)
     /// Update Note
