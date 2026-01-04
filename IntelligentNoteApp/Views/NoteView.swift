@@ -26,6 +26,7 @@ struct NoteView: View {
                 .font(.largeTitle)
                 .padding(.bottom, 18)
             TextEditor(text: $note.body)
+                .font(.system(size: 17))
         }
         .padding()
         .toolbar {
@@ -77,7 +78,7 @@ extension NoteView {
         }
         
         Task {
-            let response = try await model.analyzeWith(command: commandText)
+            let response = try await model.analyzeWith(command: commandText, noteBody: note.body)
             if let range = note.body.range(of: "Thinking...") {
                 note.body.replaceSubrange(range, with: response)
             }

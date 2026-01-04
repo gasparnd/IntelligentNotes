@@ -65,7 +65,7 @@ class NotesViewModel: ViewModelProtocol {
         }
     }
     
-    func analyzeWith(command: String) async throws -> String {
+    func analyzeWith(command: String, noteBody: String) async throws -> String {
         let (availability, reason) = checkForSystemLanguageModelAvailability()
         
         if !availability {
@@ -74,7 +74,14 @@ class NotesViewModel: ViewModelProtocol {
         
         let session = LanguageModelSession()
         
-        let prompt = "Response in the language of the entry, if that is not possible, english. Prompt: \(command)"
+        let prompt = """
+        Please respond in the language of the request and the entry; if that's not possible, use English. This is the full entry; use it for context to help you provide the best response if the request requires it.
+        =================
+        Entry: \(noteBody)
+        =================
+        Prompt: \(command)
+        =================
+        """
         
         do {
             let response = try await session.respond(to: prompt)
