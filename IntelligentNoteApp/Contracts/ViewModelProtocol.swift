@@ -18,4 +18,6 @@ protocol ViewModelProtocol: ObservableObject {
     func deleteNote(id: UUID)
     /// Donwload Note
     func downloadNote(id: UUID) -> Bool
+    /// Analyze command with FoundationModel
+    func analyzeWith(command: String) -> String
 }

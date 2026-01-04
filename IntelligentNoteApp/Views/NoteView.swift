@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FoundationModels
 internal import Combine
 
 struct NoteView: View {
@@ -73,17 +74,22 @@ extension NoteView {
         print("Think command received with instruction: \(instruction)")
         
         // Save the command text to search for it later (since the text might change)
+        
         let commandText = String(fullText[commandRange])
         
+        if let range = note.body.range(of: commandText) {
+            note.body.replaceSubrange(range, with: "Thinking...")
+        }
+        
+        let response = model.analyzeWith(command: commandText)
         // Create a Task that waits 5 seconds and then replaces the command
         Task {
             try? await Task.sleep(nanoseconds: 5_000_000_000) // 5 seconds
             
             await MainActor.run {
                 // Find the command in the current text and replace it
-                if let range = note.body.range(of: commandText) {
-                    let replacement = "This is the result of the think: command!"
-                    note.body.replaceSubrange(range, with: replacement)
+                if let range = note.body.range(of: "Thinking...") {
+                    note.body.replaceSubrange(range, with: response)
                 }
             }
         }
@@ -181,4 +187,21 @@ extension NoteView {
             }
         }
     }
+}
+
+
+import Playgrounds
+
+#Playground {
+    let session = LanguageModelSession()
+    
+    let prompt = "Where is Mendoza?"
+    
+    do {
+        let response = try await session.respond(to: prompt)
+        print(response.content)
+    } catch {
+        print("Error responding \(error.localizedDescription)")
+    }
+    
 }
