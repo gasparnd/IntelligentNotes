@@ -1,5 +1,5 @@
 //
-//  ViewModel.swift
+//  NotesViewModel.swift
 //  IntelligentNoteApp
 //
 //  Created by Gaspar Dolcemascolo on 04-01-26.
