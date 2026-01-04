@@ -26,6 +26,13 @@ class NotesViewModel: ViewModelProtocol {
         notes.append(contentsOf: storedNotes)
     }
     
+    func getNoteBy(id: UUID) -> Note? {
+        if let note = notes.first(where: { $0.id == id }) {
+            return note
+        }
+        return nil
+    }
+    
     func createNote(from note: Note) {
         dataSource.createNote(from: note)
         notes.append(note)
@@ -45,6 +52,20 @@ class NotesViewModel: ViewModelProtocol {
     }
     
     func downloadNote(id: UUID) -> Bool {
+        let note = getNoteBy(id: id)
+        guard let note else {
+            return false
+        }
+        
+        do {
+            let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+                .appendingPathComponent("\(note.title).txt")
+            
+            try note.body.write(to: url, atomically: true, encoding: .utf8)
+        } catch {
+            return false
+        }
+        
         return false
     }
     

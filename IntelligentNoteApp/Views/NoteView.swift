@@ -8,6 +8,7 @@
 import SwiftUI
 import FoundationModels
 internal import Combine
+import UniformTypeIdentifiers
 
 struct NoteView: View {
     @Binding var note: Note
@@ -19,6 +20,7 @@ struct NoteView: View {
     
     // State to track previous text and avoid multiple executions
     @State private var previousBodyText: String = ""
+    @State private var showExporter = false
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -30,9 +32,15 @@ struct NoteView: View {
         }
         .padding()
         .toolbar {
-            Button(action: didClcikDelete) {
-                Image(systemName: "trash")
-                    .foregroundStyle(Color.red)
+            HStack {
+                Button(action: didClcikDelete) {
+                    Image(systemName: "trash")
+                        .foregroundStyle(Color.red)
+                }
+                Button(action: downloadNote) {
+                    Image(systemName: "square.and.arrow.down")
+                        .foregroundStyle(Color.green)
+                }
             }
         }
         .navigationTitle("Intgelligent Notes")
@@ -62,6 +70,10 @@ extension NoteView {
     private func didClcikDelete() {
         model.deleteNote(id: note.id)
         dismiss()
+    }
+    
+    private func downloadNote() {
+        let _ = model.downloadNote(id: note.id)
     }
     
     private func updateNote() {
