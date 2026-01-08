@@ -304,11 +304,7 @@ When contributing:
 2. Update protocols when adding new features
 3. Keep views focused on presentation
 4. Put business logic in ViewModels
-5. Use SwiftData for persistence
-
-## License
-
-[Add your license information here]
+5. Use SwiftData for persistencex
 
 ## Author
 
