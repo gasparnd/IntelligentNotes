@@ -96,7 +96,7 @@ class NotesViewModel: ViewModelProtocol {
         let session = LanguageModelSession()
         
         let prompt = """
-        Please respond in the language of the request and the entry; if that's not possible, use English. This is the full entry; use it for context to help you provide the best response if the request requires it.
+        Please respond in the language of the request and the entry; if that's not possible, use English. This is the full entry; use as a context to help you provide the best response if the request requires it.
         =================
         Entry: \(noteBody)
         =================
