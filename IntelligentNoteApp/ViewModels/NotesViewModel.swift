@@ -8,6 +8,7 @@
 import Foundation
 import FoundationModels
 internal import Combine
+import CoreML
 
 class NotesViewModel: ViewModelProtocol {
     @Published var notes: [Note] = [
