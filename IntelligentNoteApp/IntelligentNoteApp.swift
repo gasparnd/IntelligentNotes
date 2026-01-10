@@ -10,10 +10,14 @@ import SwiftData
 
 @main
 struct IntelligentNoteAppApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self)
+    var appDelegate
+
     @StateObject private var model: NotesViewModel
     private let modelContainer: ModelContainer
     
     init() {
+        print("hola")
         do {
             let container = try ModelContainer(for: NoteModel.self)
             let context = container.mainContext
