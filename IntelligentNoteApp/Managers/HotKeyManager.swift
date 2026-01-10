@@ -16,6 +16,6 @@ final class HotKeyManager {
 
     private func showQuickNote() {
         print("showQuickNote")
-        NotesService.shared.createNote(from: Note(title: "Test short", body: "Test from shortcut"))
+        QuickNoteWindowController.shared.toggle()
     }
 }
